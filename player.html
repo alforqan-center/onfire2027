@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>On Fire Academy - مشغل الدروس الخاص</title>
+    <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/Fz97Zty5/Whats-App-Image-2026-09-10-at-2-49-35-AM.jpg">
+    
+    <!-- الخطوط الرسمية (تمت إضافة خط الأميري) -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Montserrat:wght@800;900&family=Cairo:wght@600;700;900&display=swap" rel="stylesheet">
+    
+    <!-- استيراد مكتبة Plyr للمشغل المخصص -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+
+    <!-- فايربيس للأمان -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
+    <style>
+        :root {
+            --plyr-color-main: #ff6b00;
+            --plyr-video-background: #000000;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Amiri', serif; /* توحيد الخط إلى الأميري */
+            user-select: none;
+        }
+        body {
+            background-color: #0b0f19;
+            color: #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #1e293b;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .site-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid #ff6b00;
+        }
+        .site-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .logo-area h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px;
+            color: #fff;
+        }
+        .logo-area h1 span {
+            color: #ff6b00;
+        }
+        .back-nav-btn {
+            background: #1e293b;
+            color: #cbd5e1;
+            border: 1px solid #334155;
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .back-nav-btn:hover {
+            background-color: #ff6b00;
+            border-color: #ff6b00;
+            color: #fff;
+        }
+        
+        /* إزالة الهوامش والحواف الجانبية للشاشة الكاملة */
+        .container {
+            flex: 1;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .player-card {
+            background: #111827;
+            border-radius: 0;
+            padding: 15px;
+            box-shadow: none;
+            border: none;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .lesson-header {
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #1e293b;
+        }
+        .lesson-title {
+            color: #f9fafb;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .custom-player-wrapper {
+            position: relative;
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #000;
+            border: 1px solid #1f2937;
+            flex: 1;
+            min-height: 70vh; /* ضبط المقاس حسب الشاشة */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* درع حماية يوتيوب */
+        .video-click-shield {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 50px);
+            z-index: 10;
+            cursor: pointer;
+            background: rgba(0,0,0,0);
+        }
+
+        /* درع حماية أزرار درايف العلوية */
+        .drive-popout-shield {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 85px;
+            height: 60px;
+            z-index: 20;
+            background: rgba(0, 0, 0, 0);
+            cursor: default;
+        }
+
+        .plyr {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            border-radius: 8px;
+            min-height: 70vh;
+        }
+
+        /* نظام التنبيهات العائمة (Toast) */
+        #toastContainer {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+        .toast-msg {
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 12px 24px;
+            border-radius: 8px;
+            border-right: 4px solid #ff6b00;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            font-size: 15px;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateY(20px);
+            pointer-events: auto;
+        }
+        .toast-msg.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+
+    <script>
+        const firebaseConfig = {
+    apiKey: "AIzaSyDjrZpDkDXefngDEmQv43oB6xG38WKkwac",
+    authDomain: "doshas-e5d12.firebaseapp.com",
+    databaseURL: "https://doshas-e5d12-default-rtdb.firebaseio.com",
+    projectId: "doshas-e5d12",
+    storageBucket: "doshas-e5d12.firebasestorage.app",
+    messagingSenderId: "1005308467875",
+    appId: "1:1005308467875:web:7de501912aa760024dbd16",
+    measurementId: "G-CRXBZTTB83"
+};
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const guardDb = firebase.database();
+
+        // دالة إظهار التنبيهات العائمة Toast
+        function showToast(message) {
+            let container = document.getElementById('toastContainer');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toastContainer';
+                document.body.appendChild(container);
+            }
+            const toast = document.createElement('div');
+            toast.className = 'toast-msg';
+            toast.innerText = message;
+            container.appendChild(toast);
+
+            setTimeout(() => { toast.classList.add('show'); }, 50);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => { toast.remove(); }, 300);
+            }, 3500);
+        }
+
+        const guardAuth = firebase.auth();
+        guardAuth.onAuthStateChanged(async function(user) {
+            if (!user) {
+                showToast('الرجاء تسجيل الدخول أولاً');
+                setTimeout(() => window.location.replace('index.html'), 700);
+                return;
+            }
+            if ((user.email || '').toLowerCase() === 'ofire8000@gmail.com') {
+                window.location.replace('control.html');
+                return;
+            }
+            try {
+                const profileSnap = await guardDb.ref('studentProfiles/' + user.uid).once('value');
+                const profile = profileSnap.val();
+                if (!profile || !profile.gradePage) {
+                    window.location.replace('index.html');
+                    return;
+                }
+                const legacyCode = (user.email || '').split('@')[0];
+                if (legacyCode) {
+                    const legacySnap = await guardDb.ref('codes/' + legacyCode).once('value');
+                    if (legacySnap.exists()) {
+                        const status = String((legacySnap.val() || {}).status || 'active').trim().toLowerCase();
+                        if (['inactive', 'stopped', 'false'].includes(status)) {
+                            await guardAuth.signOut();
+                            showToast('الحساب موقوف أو الاشتراك غير نشط');
+                            setTimeout(() => window.location.replace('index.html?expired=true'), 700);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('تعذر التحقق من ملف الطالب:', error);
+            }
+        });
+    </script>
+
+    <meta name="theme-color" content="#ff6b00">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" type="image/svg+xml" href="app-icon.svg">
+    <link rel="stylesheet" href="app-enhancements.css">
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <div class="site-logo">
+                <img src="https://i.postimg.cc/Fz97Zty5/Whats-App-Image-2026-09-10-at-2-49-35-AM.jpg" alt="Logo">
+            </div>
+            <h1>On <span>Fire</span> ACADEMY</h1>
+        </div>
+        <button class="back-nav-btn" onclick="goBack()">← العودة للدروس</button>
+    </header>
+
+    <div class="container">
+        <div class="player-card">
+            <div class="lesson-header">
+                <h2 class="lesson-title" id="displayLessonTitle">جاري تحميل الدرس...</h2>
+            </div>
+
+            <div class="custom-player-wrapper" id="mediaWrapper" oncontextmenu="return false;">
+                <div class="video-click-shield" id="clickShield" onclick="togglePlayPause()" style="display:none;"></div>
+                <div id="plyrTarget"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- حاوية التنبيهات العائمة -->
+    <div id="toastContainer"></div>
+
+    <script>
+        let plyrInstance = null;
+
+        function getSmartParam(paramName) {
+            const href = window.location.href;
+            const key = paramName + '=';
+            const startIdx = href.indexOf(key);
+            if (startIdx === -1) return null;
+            let valStart = startIdx + key.length;
+            let valEnd = href.length;
+
+            if (paramName === 'url') {
+                const nextTitle = href.indexOf('&title=', valStart);
+                if (nextTitle !== -1) valEnd = nextTitle;
+            } else if (paramName === 'title') {
+                const nextFrom = href.indexOf('&from=', valStart);
+                if (nextFrom !== -1) valEnd = nextFrom;
+            }
+
+            const rawVal = href.substring(valStart, valEnd);
+            try { return decodeURIComponent(rawVal); } catch(e) { return rawVal; }
+        }
+
+        function extractYouTubeId(url) {
+            if (!url) return null;
+            const regExp = /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/;
+            const match = url.match(regExp);
+            return (match && match[1]) ? match[1] : null;
+        }
+
+        function extractGoogleDriveId(url) {
+            if (!url) return null;
+            const regExp = /(?:drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?.*id=)|lh3\.googleusercontent\.com\/d\/|docs\.google\.com\/file\/d\/)([a-zA-Z0-9_-]+)/;
+            const match = url.match(regExp);
+            return (match && match[1]) ? match[1] : null;
+        }
+
+        function cleanMediaUrl(url) {
+            try {
+                let parsed = new URL(url);
+                return parsed.origin + parsed.pathname;
+            } catch(e) {
+                return url.split('?')[0];
+            }
+        }
+
+        function isDirectVideo(url) {
+            const clean = cleanMediaUrl(url).toLowerCase();
+            return clean.endsWith('.mp4') || clean.endsWith('.webm') || clean.endsWith('.mov');
+        }
+
+        function togglePlayPause() {
+            if (plyrInstance) {
+                plyrInstance.togglePlay();
+            }
+        }
+
+        function renderPlayer(rawUrl) {
+            const wrapper = document.getElementById('mediaWrapper');
+            const shield = document.getElementById('clickShield');
+            
+            if (plyrInstance) { 
+                plyrInstance.destroy(); 
+                plyrInstance = null; 
+            }
+            
+            let currentTargetUrl = rawUrl.trim();
+
+            const plyrControls = [
+                'play-large', 'rewind', 'play', 'fast-forward',
+                'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'fullscreen'
+            ];
+
+            const ytId = extractYouTubeId(currentTargetUrl);
+            const driveId = extractGoogleDriveId(currentTargetUrl);
+
+            // 1. فيديوهات يوتيوب
+            if (ytId) {
+                shield.style.display = 'block';
+                wrapper.innerHTML = `
+                    <div class="video-click-shield" id="clickShield" onclick="togglePlayPause()"></div>
+                    <div id="plyrTarget" data-plyr-provider="youtube" data-plyr-embed-id="${ytId}"></div>
+                `;
+
+                plyrInstance = new Plyr('#plyrTarget', {
+                    controls: plyrControls,
+                    seekTime: 10,
+                    youtube: { 
+                        noCookie: true, 
+                        rel: 0, 
+                        showinfo: 0, 
+                        iv_load_policy: 3, 
+                        modestbranding: 1,
+                        controls: 0,
+                        disablekb: 1
+                    }
+                });
+                showToast('تم تحميل الدرس بنجاح');
+                return;
+            }
+
+            // 2. فيديوهات جوجل درايف
+            if (driveId) {
+                shield.style.display = 'none';
+                wrapper.innerHTML = `
+                    <div class="drive-popout-shield"></div>
+                    <iframe src="https://drive.google.com/file/d/${driveId}/preview" 
+                            allow="autoplay; encrypted-media" 
+                            allowfullscreen>
+                    </iframe>`;
+                showToast('تم تحميل الدرس بنجاح');
+                return;
+            }
+
+            // 3. الفيديوهات المباشرة
+            if (isDirectVideo(currentTargetUrl)) {
+                shield.style.display = 'none';
+                const cleanUrl = cleanMediaUrl(currentTargetUrl);
+                wrapper.innerHTML = `
+                    <video id="plyrTarget" controls playsinline style="width:100%; height:100%;">
+                        <source src="${cleanUrl}" type="video/mp4">
+                        <source src="${currentTargetUrl}" type="video/mp4">
+                    </video>`;
+
+                plyrInstance = new Plyr('#plyrTarget', {
+                    controls: plyrControls,
+                    seekTime: 10
+                });
+                showToast('تم تحميل الدرس بنجاح');
+                return;
+            }
+
+            // 4. أي رابط تضمين آخر
+            shield.style.display = 'none';
+            wrapper.innerHTML = `<iframe src="${currentTargetUrl}" allowfullscreen></iframe>`;
+            showToast('تم تحميل الدرس بنجاح');
+        }
+
+        window.onload = function() {
+            const rawUrl = getSmartParam('url');
+            const rawTitle = getSmartParam('title');
+            if (rawTitle) document.getElementById('displayLessonTitle').innerText = rawTitle;
+            if (rawUrl) {
+                renderPlayer(rawUrl);
+            } else {
+                showToast('عذراً، رابط الدرس غير متوفر');
+            }
+        };
+
+        document.addEventListener('keydown', function(e) {
+            if (!plyrInstance) return;
+            if (e.code === 'ArrowRight') {
+                plyrInstance.forward(10);
+            } else if (e.code === 'ArrowLeft') {
+                plyrInstance.rewind(10);
+            } else if (e.code === 'Space') {
+                e.preventDefault();
+                plyrInstance.togglePlay();
+            }
+        });
+
+        function goBack() {
+            const fromParam = getSmartParam('from');
+            if (fromParam) {
+                window.location.href = fromParam;
+                return;
+            }
+            if (document.referrer && document.referrer.trim() !== '' && document.referrer.includes(window.location.host)) {
+                window.location.href = document.referrer;
+                return;
+            }
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = "first-prep.html";
+            }
+        }
+    </script>
+    <script src="app-enhancements.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>On Fire Academy - بوابة تسجيل الدخول</title>
+    <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/Fz97Zty5/Whats-App-Image-2026-09-10-at-2-49-35-AM.jpg">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,800;0,900;1,800&family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Amiri', serif; }
+        body { background-color: #0b0f19; color: #cbd5e1; display: flex; flex-direction: column; min-height: 100vh; position: relative; }
+        body::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255, 107, 0, 0.05) 0%, rgba(11, 15, 25, 0.95) 100%); z-index: -1; }
+        header { background-color: #0f172a; color: #f8fafc; padding: 18px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #1e293b; }
+        .logo-area { display: flex; align-items: center; gap: 14px; }
+        .site-logo { width: 44px; height: 44px; border-radius: 50%; overflow: hidden; border: 2px solid #ff6b00; box-shadow: 0 0 12px rgba(255, 107, 0, 0.3); background-color: #000; flex-shrink: 0; }
+        .site-logo img { width: 100%; height: 100%; object-fit: cover; }
+        .logo-area h1 { font-family: 'Montserrat', sans-serif; font-size: 24px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; color: #ffffff; }
+        .logo-area h1 .fire-text { background: linear-gradient(135deg, #ff7700 0%, #ff3b00 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo-area span.academy-text { font-size: 14px; font-weight: 700; color: #94a3b8; letter-spacing: 2px; margin-right: 6px; }
+        .portal-badge { font-size: 14px; background: #1e293b; color: #cbd5e1; padding: 6px 16px; border-radius: 20px; border: 1px solid #334155; font-weight: 700; }
+        .container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .login-card { background: #111827; padding: 40px; border-radius: 14px; box-shadow: 0 20px 30px -5px rgba(0, 0, 0, 0.6); width: 100%; max-width: 420px; border: 1px solid #1f2937; text-align: right; }
+        .login-card h2 { margin-bottom: 8px; color: #f9fafb; font-size: 24px; font-weight: 700; }
+        .login-card p { margin-bottom: 25px; color: #9ca3af; font-size: 15px; line-height: 1.6; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 15px; color: #d1d5db; font-weight: 700; }
+        .login-card input { width: 100%; padding: 14px; font-size: 17px; text-align: right; direction: ltr; background-color: #030712; border: 1px solid #374151; color: #fff; border-radius: 8px; outline: none; }
+        .login-card input:focus { border-color: #ff6b00; box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.15); }
+        .login-card button { width: 100%; background: linear-gradient(135deg, #ff6b00, #e65c00); color: white; border: none; padding: 13px; font-size: 18px; font-weight: 700; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 12px rgba(255, 107, 0, 0.3); }
+        .login-card button:hover { background: linear-gradient(135deg, #e65c00, #cc5200); }
+        .login-card button.google-button { margin-top: 12px; background: #fff; color: #202124; box-shadow: none; border: 1px solid #dadce0; }
+        .login-card button.google-button:hover { background: #f3f4f6; }
+        .error-msg { color: #f87171; margin-top: 15px; font-size: 14px; display: block; background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.2); text-align: center; font-weight: bold; }
+        footer { text-align: center; padding: 20px; background-color: #0f172a; color: #64748b; font-size: 13px; border-top: 1px solid #1e293b; }
+    </style>
+
+    <meta name="theme-color" content="#ff6b00">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" type="image/svg+xml" href="app-icon.svg">
+    <link rel="stylesheet" href="app-enhancements.css">
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <div class="site-logo">
+                <img src="https://i.postimg.cc/Fz97Zty5/Whats-App-Image-2026-09-10-at-2-49-35-AM.jpg" alt="On Fire Logo">
+            </div>
+            <h1><span class="fire-text">On Fire</span> <span class="academy-text">ACADEMY</span></h1>
+        </div>
+        <div class="portal-badge">بوابة الطلاب الرسمية</div>
+    </header>
+
+    <div class="container">
+        <div class="login-card">
+            <h2>تسجيل الدخول</h2>
+            <p>سجّل الدخول بحسابك المسجّل في Firebase. بعد التحقق، سيتم توجيه الأدمن للكنترول والطالب لاختيار صفه.</p>
+            
+            <div id="loginFields">
+            <div class="form-group">
+                <label for="studentEmail">البريد الإلكتروني (الـ Gmail)</label>
+                <input type="email" id="studentEmail" placeholder="example@gmail.com" autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label for="studentPassword">كلمة المرور</label>
+                <input type="password" id="studentPassword" placeholder="أدخل كلمة المرور..." autocomplete="current-password">
+            </div>
+
+            <button id="loginButton" onclick="handleLogin()">تسجيل الدخول بالبريد وكلمة المرور</button>
+            <button type="button" class="google-button" onclick="handleGoogleLogin()">المتابعة باستخدام Google</button>
+            <p style="text-align:center;margin:16px 0 0;color:#9ca3af">أول مرة هنا؟ <a href="create-account.html" style="color:#ff8a24;font-weight:bold">إنشاء حساب جديد</a></p>
+            </div>
+            <div id="gradeFields" style="display:none">
+                <div class="form-group">
+                    <label for="selectedGrade">اختار صفك الدراسي</label>
+                    <select id="selectedGrade" style="width:100%;padding:14px;font-size:17px;background:#030712;border:1px solid #374151;color:#fff;border-radius:8px;">
+                        <option value="">-- اختر الصف الدراسي --</option>
+                        <option value="first-prep.html">الصف الأول الإعدادي</option>
+                        <option value="second-prep.html">الصف الثاني الإعدادي</option>
+                        <option value="third-prep.html">الصف الثالث الإعدادي</option>
+                        <option value="first-secondary.html">الصف الأول الثانوي</option>
+                        <option value="second-secondary.html">الصف الثاني الثانوي</option>
+                        <option value="third-secondary.html">الصف الثالث الثانوي</option>
+                    </select>
+                    <p style="margin:8px 0 0;font-size:13px;color:#fbbf24;">تنبيه: بعد تأكيد الصف، لا يمكن تغييره إلا عن طريق الإدارة.</p>
+                </div>
+                <button onclick="confirmGrade()">تأكيد الصف والدخول</button>
+            </div>
+            <div id="errorMsg" class="error-msg" style="display: none;"></div>
+        </div>
+    </div>
+
+    <footer>
+        جميع الحقوق محفوظة © On Fire Academy 2026
+    </footer>
+
+    <script>
+        const firebaseConfig = {
+    apiKey: "AIzaSyDjrZpDkDXefngDEmQv43oB6xG38WKkwac",
+    authDomain: "doshas-e5d12.firebaseapp.com",
+    databaseURL: "https://doshas-e5d12-default-rtdb.firebaseio.com",
+    projectId: "doshas-e5d12",
+    storageBucket: "doshas-e5d12.firebasestorage.app",
+    messagingSenderId: "1005308467875",
+    appId: "1:1005308467875:web:7de501912aa760024dbd16",
+    measurementId: "G-CRXBZTTB83"
+};
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const auth = firebase.auth();
+        const ADMIN_EMAIL = "ofire8000@gmail.com".toLowerCase();
+        let signedInUser = null;
+
+        function getDeviceId() {
+            let deviceId = localStorage.getItem('center_device_id');
+            if (!deviceId) {
+                deviceId = 'dev_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+                localStorage.setItem('center_device_id', deviceId);
+            }
+            return deviceId;
+        }
+
+        function getTargetPageByGrade(grade) {
+            if (!grade) return "first-prep.html";
+            const g = grade.trim();
+            const has = (...labels) => labels.some(label => g.includes(label));
+            if (has("ثانية إعدادي", "تانية إعدادي", "ثانيه اعدادي", "الصف الثاني الإعدادي", "الصف التاني الإعدادي")) return "second-prep.html";
+            if (has("ثالثة إعدادي", "تالته إعدادي", "ثالثه اعدادي", "الصف الثالث الإعدادي", "الصف التالت الإعدادي")) return "third-prep.html";
+            if (has("أولى ثانوي", "اولى ثانوي", "الصف الأول الثانوي", "الصف الاول الثانوي")) return "first-secondary.html";
+            if (has("ثانية ثانوي", "تانية ثانوي", "ثانيه ثانوي", "الصف الثاني الثانوي", "الصف التاني الثانوي")) return "second-secondary.html";
+            if (has("ثالثة ثانوي", "تالته ثانوي", "ثالثه ثانوي", "الصف الثالث الثانوي", "الصف التالت الثانوي")) return "third-secondary.html";
+            return "first-prep.html";
+        }
+
+        // استخراج الكود من الإيميل (الجزء اللي قبل علامة @ أو الإيميل كله لو مش كاتب @)
+        function extractCodeFromEmail(emailInput) {
+            let cleanInput = emailInput.trim();
+            if (cleanInput.includes('@')) {
+                return cleanInput.split('@')[0].trim();
+            }
+            return cleanInput;
+        }
+
+        function showAuthError(prefix, error) {
+            const errorMsg = document.getElementById('errorMsg');
+            const code = error && error.code ? error.code : 'unknown-error';
+            console.error(prefix, code, error);
+            const friendly = {
+                'auth/unauthorized-domain': 'نطاق الموقع غير مسموح في Firebase. أضف نطاق الموقع المنشور إلى Authorized domains.',
+                'auth/operation-not-allowed': 'طريقة تسجيل الدخول غير مفعّلة في Firebase.',
+                'auth/invalid-api-key': 'مفتاح Firebase API غير صحيح.',
+                'auth/network-request-failed': 'الاتصال بخدمات Firebase فشل. افحص الإنترنت أو جرّب متصفحًا آخر.',
+                'auth/invalid-email': 'صيغة البريد الإلكتروني غير صحيحة.',
+                'auth/email-already-in-use': 'البريد الإلكتروني مسجل بالفعل. سجّل الدخول بدلًا من إنشاء حساب جديد.',
+                'auth/weak-password': 'كلمة المرور ضعيفة؛ استخدم 6 أحرف أو أكثر.',
+                'auth/missing-password': 'اكتب كلمة المرور.',
+                'auth/credential-already-in-use': 'بيانات الدخول مرتبطة بحساب آخر.',
+                'auth/user-not-found': 'هذا البريد غير مسجّل في Firebase Authentication.',
+                'auth/wrong-password': 'كلمة المرور غير صحيحة.',
+                'auth/invalid-credential': 'بيانات الدخول غير صحيحة أو الحساب غير مسجّل بهذه الطريقة.',
+                'auth/too-many-requests': 'محاولات كثيرة؛ انتظر قليلًا ثم حاول مرة أخرى.',
+                'auth/popup-blocked': 'المتصفح منع نافذة Google. جرّب فتح الموقع في Chrome أو استخدم إعادة التوجيه.',
+                'auth/popup-closed-by-user': 'تم إغلاق نافذة تسجيل الدخول قبل إكمال العملية.',
+                'auth/cancelled-popup-request': 'تم إلغاء نافذة تسجيل الدخول؛ حاول مرة أخرى.',
+                'auth/web-storage-unsupported': 'المتصفح لا يسمح بالتخزين المطلوب لتسجيل الدخول. افتح الموقع في Chrome مباشرة.',
+                'auth/user-disabled': 'تم إيقاف هذا الحساب. تواصل مع الإدارة.',
+                'auth/invalid-login-credentials': 'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
+                'auth/account-exists-with-different-credential': 'هذا البريد مرتبط بطريقة دخول أخرى. استخدم طريقة الدخول الأصلية.',
+                'auth/internal-error': 'حدث خطأ داخلي أثناء تسجيل الدخول. حاول مرة أخرى.'
+            };
+            errorMsg.innerText = (friendly[code] || 'فشل تسجيل الدخول. رمز الخطأ: ' + code) + ' (رمز: ' + code + ')';
+            errorMsg.style.display = 'block';
+        }
+
+        window.onload = async function() {
+            const errorMsg = document.getElementById('errorMsg');
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('expired') === 'true') { errorMsg.innerText = "عذراً، انتهت صلاحية الاشتراك أو تم إيقاف الحساب."; errorMsg.style.display = 'block'; }
+            // يلتقط أخطاء العودة من Google redirect بدل إخفائها برسالة عامة.
+            auth.getRedirectResult().catch(error => {
+                if (error && error.code && error.code !== 'auth/no-auth-event') showAuthError('Google redirect error:', error);
+            });
+            auth.onAuthStateChanged(async user => {
+                if (!user) {
+                    signedInUser = null;
+                    return;
+                }
+                signedInUser = user;
+                if ((user.email || '').toLowerCase() === ADMIN_EMAIL) {
+                    window.location.replace('control.html');
+                    return;
+                }
+                // بعد نجاح تسجيل الدخول، افتح مساحة الطالب التي تحتوي على قوائم التطبيق.
+                window.location.replace('dashboard.html');
+                return;
+
+                const loginFields = document.getElementById('loginFields');
+                const gradeFields = document.getElementById('gradeFields');
+                const title = document.querySelector('.login-card h2');
+                const description = document.querySelector('.login-card > p');
+                loginFields.style.display = 'none';
+                gradeFields.style.display = 'block';
+                title.innerText = 'اختيار الصف الدراسي';
+                description.innerText = 'تم التحقق من حسابك. اختار صفك الدراسي للمتابعة.';
+
+                try {
+                    const profileSnap = await db.ref('studentProfiles/' + user.uid).once('value');
+                    const profile = profileSnap.val();
+                    const allowedPages = [
+                        'first-prep.html', 'second-prep.html', 'third-prep.html',
+                        'first-secondary.html', 'second-secondary.html', 'third-secondary.html'
+                    ];
+                    if (profile && profile.gradePage) {
+                        if (allowedPages.includes(profile.gradePage)) {
+                            window.location.replace(profile.gradePage);
+                            return;
+                        }
+                        console.error('Invalid gradePage in student profile:', profile.gradePage);
+                        const errorMsg = document.getElementById('errorMsg');
+                        errorMsg.innerText = 'بيانات الصف المرتبطة بالحساب غير صحيحة. تواصل مع الإدارة.';
+                        errorMsg.style.display = 'block';
+                    }
+                } catch(e) {
+                    console.error('تعذر تحميل ملف الطالب:', e);
+                    const errorMsg = document.getElementById('errorMsg');
+                    errorMsg.innerText = 'تم تسجيل الدخول، لكن تعذر قراءة بيانات الحساب. راجع صلاحيات Firebase واتصال الإنترنت.';
+                    errorMsg.style.display = 'block';
+                }
+            });
+        };
+
+        async function handleGoogleLogin() {
+            const errorMsg = document.getElementById('errorMsg');
+            errorMsg.style.display = 'none';
+            if (window.location.protocol === 'file:') {
+                errorMsg.innerText = 'تسجيل الدخول بجوجل لا يعمل من ملف HTML مباشر. افتح الموقع من رابط الاستضافة أو من localhost.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                provider.setCustomParameters({ prompt: 'select_account' });
+                // إعادة التوجيه أنسب غالبًا للهواتف من popup الذي قد يغلقه المتصفح بسرعة.
+                await auth.signInWithRedirect(provider);
+            } catch (error) {
+                showAuthError('Google sign-in error:', error);
+            }
+        }
+
+        async function handleLogin() {
+            const emailInput = document.getElementById('studentEmail');
+            const passwordInput = document.getElementById('studentPassword');
+            const button = document.getElementById('loginButton');
+            const email = emailInput.value.trim().toLowerCase();
+            const password = passwordInput.value;
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (window.location.protocol === 'file:') {
+                errorMsg.innerText = 'لا يمكن تسجيل الدخول من ملف HTML مباشر. افتح الموقع من رابط الاستضافة أو من localhost.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+            if (!email || !password) {
+                errorMsg.innerText = 'اكتب البريد الإلكتروني وكلمة المرور.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+            if (!emailInput.checkValidity()) {
+                errorMsg.innerText = 'اكتب بريدًا إلكترونيًا صحيحًا.';
+                errorMsg.style.display = 'block';
+                emailInput.focus();
+                return;
+            }
+
+            errorMsg.style.display = 'none';
+            if (button) {
+                button.disabled = true;
+                button.dataset.originalText = button.innerText;
+                button.innerText = 'جارٍ تسجيل الدخول...';
+            }
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+            } catch(error) {
+                showAuthError('Email/password sign-in error:', error);
+            } finally {
+                if (button) {
+                    button.disabled = false;
+                    button.innerText = button.dataset.originalText || 'تسجيل الدخول بالبريد وكلمة المرور';
+                }
+            }
+        }
+
+        async function confirmGrade() {
+            const user = auth.currentUser;
+            const page = document.getElementById('selectedGrade').value;
+            const errorMsg = document.getElementById('errorMsg');
+            if (!user) { errorMsg.innerText = 'سجّل الدخول أولًا.'; errorMsg.style.display = 'block'; return; }
+            const allowedPages = [
+                'first-prep.html', 'second-prep.html', 'third-prep.html',
+                'first-secondary.html', 'second-secondary.html', 'third-secondary.html'
+            ];
+            if (!page || !allowedPages.includes(page)) {
+                errorMsg.innerText = 'اختار صفًا دراسيًا صحيحًا أولًا.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+            try {
+                const ref = db.ref('studentProfiles/' + user.uid);
+                const snap = await ref.once('value');
+                if (snap.exists() && snap.val().gradePage && snap.val().gradePage !== page) { errorMsg.innerText = 'الصف مرتبط بهذا الحساب بالفعل. تواصل مع الإدارة لتعديله.'; errorMsg.style.display = 'block'; return; }
+                const gradeNames = {'first-prep.html':'الصف الأول الإعدادي','second-prep.html':'الصف الثاني الإعدادي','third-prep.html':'الصف الثالث الإعدادي','first-secondary.html':'الصف الأول الثانوي','second-secondary.html':'الصف الثاني الثانوي','third-secondary.html':'الصف الثالث الثانوي'};
+                await ref.update({email:user.email, gradePage:page, grade:gradeNames[page], createdAt: snap.exists() ? (snap.val().createdAt || Date.now()) : Date.now()});
+                localStorage.setItem('activeStudentCode', (user.email || '').split('@')[0]);
+                window.location.replace(page);
+            } catch(e) { console.error(e); errorMsg.innerText = 'تعذر حفظ الصف. راجع اتصال الإنترنت وصلاحيات قاعدة البيانات.'; errorMsg.style.display = 'block'; }
+        }
+
+        document.getElementById('studentEmail').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') handleLogin();
+        });
+        document.getElementById('studentPassword').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') handleLogin();
+        });
+    </script>
+    <script src="app-enhancements.js" defer></script>
+</body>
+</html>

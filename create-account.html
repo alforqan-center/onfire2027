@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>On Fire Academy - إنشاء حساب</title>
+<link rel="icon" type="image/jpeg" href="https://i.postimg.cc/Fz97Zty5/Whats-App-Image-2026-09-10-at-2-49-35-AM.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Amiri',serif} body{background:#0b0f19;color:#cbd5e1;min-height:100vh;display:flex;flex-direction:column}
+header,footer{background:#0f172a;padding:18px 24px;text-align:center} header{border-bottom:2px solid #1e293b} footer{margin-top:auto;border-top:1px solid #1e293b;color:#64748b}
+main{flex:1;display:flex;align-items:center;justify-content:center;padding:24px} .card{background:#111827;border:1px solid #1f2937;border-radius:16px;padding:32px;width:100%;max-width:440px;box-shadow:0 20px 40px #0008}
+h1{color:#ff6b00;font-family:Montserrat,sans-serif;font-size:25px} h2{color:#f9fafb;margin:14px 0 6px;font-size:26px} .sub{color:#9ca3af;margin-bottom:22px;line-height:1.7}
+label{display:block;margin:14px 0 6px;font-weight:bold} input{width:100%;padding:13px;border-radius:8px;border:1px solid #374151;background:#030712;color:white;font-size:16px;direction:ltr;text-align:left} input:focus{outline:2px solid #ff6b00;border-color:#ff6b00}
+button{width:100%;margin-top:20px;padding:13px;border:0;border-radius:8px;background:linear-gradient(135deg,#ff6b00,#e65c00);color:white;font-size:18px;font-weight:bold;cursor:pointer} button:disabled{opacity:.65;cursor:wait}
+.msg{display:none;margin-top:15px;padding:11px;border-radius:8px;text-align:center;line-height:1.6} .error{color:#fecaca;background:#7f1d1d44;border:1px solid #ef444455} .success{color:#bbf7d0;background:#14532d55;border:1px solid #22c55e55} .bottom{text-align:center;margin-top:18px;color:#9ca3af} a{color:#ff8a24;font-weight:bold}
+</style>
+    <meta name="theme-color" content="#ff6b00">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" type="image/svg+xml" href="app-icon.svg">
+    <link rel="stylesheet" href="app-enhancements.css">
+</head>
+<body><header><h1>ON FIRE ACADEMY</h1></header>
+<main><section class="card"><h2>إنشاء حساب جديد</h2><p class="sub">أنشئ حسابك للبدء، وبعدها سجّل الدخول واختر صفك الدراسي.</p>
+<form id="signupForm">
+<label for="fullName">الاسم</label><input id="fullName" type="text" autocomplete="name" maxlength="80" required placeholder="اكتب اسمك">
+<label for="email">البريد الإلكتروني</label><input id="email" type="email" autocomplete="email" required placeholder="example@gmail.com">
+<label for="password">كلمة المرور</label><input id="password" type="password" autocomplete="new-password" minlength="6" required placeholder="6 أحرف على الأقل">
+<label for="confirmPassword">تأكيد كلمة المرور</label><input id="confirmPassword" type="password" autocomplete="new-password" minlength="6" required placeholder="اكتب كلمة المرور مرة أخرى">
+<button id="signupButton" type="submit">إنشاء الحساب</button>
+</form><div id="message" class="msg" role="alert"></div>
+<p class="bottom">عندك حساب بالفعل؟ <a href="index.html">تسجيل الدخول</a></p></section></main>
+<footer>جميع الحقوق محفوظة © On Fire Academy 2026</footer>
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyDjrZpDkDXefngDEmQv43oB6xG38WKkwac",
+    authDomain: "doshas-e5d12.firebaseapp.com",
+    databaseURL: "https://doshas-e5d12-default-rtdb.firebaseio.com",
+    projectId: "doshas-e5d12",
+    storageBucket: "doshas-e5d12.firebasestorage.app",
+    messagingSenderId: "1005308467875",
+    appId: "1:1005308467875:web:7de501912aa760024dbd16",
+    measurementId: "G-CRXBZTTB83"
+};
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+const form = document.getElementById('signupForm');
+const message = document.getElementById('message');
+const button = document.getElementById('signupButton');
+function showMessage(text, isError=true) {
+ message.textContent=text; message.className='msg '+(isError?'error':'success'); message.style.display='block';
+}
+function friendlyError(error) {
+ const map={
+ 'auth/email-already-in-use':'البريد الإلكتروني مسجل بالفعل. انتقل إلى صفحة تسجيل الدخول.',
+ 'auth/invalid-email':'صيغة البريد الإلكتروني غير صحيحة.',
+ 'auth/weak-password':'كلمة المرور ضعيفة؛ استخدم 6 أحرف على الأقل.',
+ 'auth/operation-not-allowed':'إنشاء الحساب بالبريد وكلمة المرور غير مفعّل في إعدادات Firebase.',
+ 'auth/unauthorized-domain':'نطاق الموقع غير مسموح في Firebase. أضفه إلى Authorized domains.',
+ 'auth/network-request-failed':'تعذر الاتصال. افحص الإنترنت وحاول مرة أخرى.',
+ 'auth/too-many-requests':'محاولات كثيرة؛ انتظر قليلًا ثم حاول مرة أخرى.'
+ };
+ return map[error.code] || 'تعذر إنشاء الحساب. رمز الخطأ: '+(error.code||'unknown-error');
+}
+form.addEventListener('submit', async (event) => {
+ event.preventDefault();
+ message.style.display='none';
+ if (location.protocol==='file:') { showMessage('افتح الموقع من الاستضافة أو localhost، لا تفتحه كملف HTML مباشر.'); return; }
+ const name=document.getElementById('fullName').value.trim();
+ const email=document.getElementById('email').value.trim().toLowerCase();
+ const password=document.getElementById('password').value;
+ const confirm=document.getElementById('confirmPassword').value;
+ if (!name) { showMessage('اكتب اسمك أولًا.'); return; }
+ if (password.length<6) { showMessage('كلمة المرور يجب ألا تقل عن 6 أحرف.'); return; }
+ if (password!==confirm) { showMessage('كلمتا المرور غير متطابقتين.'); return; }
+ button.disabled=true; button.textContent='جارٍ إنشاء الحساب...';
+ try {
+   const credential=await auth.createUserWithEmailAndPassword(email,password);
+   try {
+     await db.ref('studentProfiles/'+credential.user.uid).update({name:name,email:email,createdAt:Date.now()});
+   } catch(profileError) {
+     // الحساب أنشئ بنجاح؛ اختيار الصف من صفحة الدخول سيحاول إنشاء/تحديث الملف لاحقًا.
+     console.warn('تعذر إنشاء ملف الطالب الآن:',profileError);
+   }
+   showMessage('تم إنشاء الحساب بنجاح. سيتم نقلك إلى صفحة تسجيل الدخول...',false);
+   setTimeout(()=>location.replace('index.html'),900);
+ } catch(error) {
+   console.error('Account creation error:',error);
+   showMessage(friendlyError(error));
+   button.disabled=false; button.textContent='إنشاء الحساب';
+ }
+});
+</script>    <script src="app-enhancements.js" defer></script>
+</body></html>

@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="htmlRoot">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">On Fire Academy - منصة الدروس</title>
+    <!-- استيراد خطوط احترافية -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,800;0,900;1,800&family=Cairo:wght@600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #0b0f19;
+            color: #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 107, 0, 0.05) 0%, rgba(11, 15, 25, 0.95) 100%);
+            z-index: -1;
+        }
+        header {
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 18px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #1e293b;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .site-logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid #ff6b00;
+            box-shadow: 0 0 12px rgba(255, 107, 0, 0.3);
+            background-color: #000;
+            flex-shrink: 0;
+        }
+        .site-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .logo-area h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #ffffff;
+        }
+        .logo-area h1 .fire-text {
+            background: linear-gradient(135deg, #ff7700 0%, #ff3b00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(255, 85, 0, 0.3);
+        }
+        .logo-area span.academy-text {
+            font-family: 'Cairo', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: #94a3b8;
+            letter-spacing: 2px;
+            margin-right: 6px;
+        }
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .lang-btn {
+            background-color: #1e293b;
+            color: #cbd5e1;
+            border: 1px solid #334155;
+            padding: 6px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .lang-btn:hover {
+            border-color: #ff6b00;
+            color: #fff;
+        }
+        .logout-btn {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 6px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .logout-btn:hover {
+            background-color: #ef4444;
+            color: white;
+        }
+        .container {
+            flex: 1;
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 20px;
+            width: 90%;
+        }
+        .section-title {
+            margin-bottom: 8px;
+            color: #f9fafb;
+            font-size: 22px;
+            font-weight: 700;
+        }
+        .section-desc {
+            margin-bottom: 25px;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+        .teachers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .teacher-card {
+            background: #111827;
+            padding: 18px;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #1f2937;
+            text-align: right;
+        }
+        .teacher-card:hover {
+            transform: translateY(-4px);
+            border-color: #ff6b00;
+            box-shadow: 0 12px 25px rgba(255, 107, 0, 0.1);
+        }
+        .teacher-avatar {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ff6b00;
+            background-color: #030712;
+            flex-shrink: 0;
+        }
+        .teacher-info {
+            flex: 1;
+        }
+        .teacher-subject { margin: 6px 0 0; color: #38bdf8; font-size: 14px; font-weight: 700; }
+
+        .teacher-info h3 {
+            font-size: 16px;
+            color: #f9fafb;
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+        .lessons-section {
+            background: #111827;
+            padding: 30px;
+            border-radius: 14px;
+            box-shadow: 0 20px 30px -5px rgba(0, 0, 0, 0.6);
+            border: 1px solid #1f2937;
+            display: none;
+        }
+        .lessons-section h2 {
+            color: #f9fafb;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        .unit-title {
+            color: #38bdf8;
+            font-size: 17px;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 12px;
+            border-bottom: 1px dashed #1e293b;
+            padding-bottom: 6px;
+        }
+        .lesson-card-item {
+            background: #1f2937;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #374151;
+        }
+        .lesson-title {
+            font-weight: 700;
+            font-size: 15px;
+            color: #f3f4f6;
+        }
+        .watch-btn {
+            background: linear-gradient(135deg, #ff6b00, #e65c00);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(255, 107, 0, 0.3);
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+        .watch-btn:hover {
+            background: linear-gradient(135deg, #e65c00, #cc5200);
+        }
+        .back-to-teachers {
+            background-color: #1e293b;
+            color: #cbd5e1;
+            border: 1px solid #334155;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .back-to-teachers:hover {
+            background-color: #334155;
+            color: white;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #0f172a;
+            color: #64748b;
+            font-size: 12px;
+            border-top: 1px solid #1e293b;
+        }
+    </style>
+
+    <!-- استيراد فايربيس -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+    apiKey: "AIzaSyDjrZpDkDXefngDEmQv43oB6xG38WKkwac",
+    authDomain: "doshas-e5d12.firebaseapp.com",
+    databaseURL: "https://doshas-e5d12-default-rtdb.firebaseio.com",
+    projectId: "doshas-e5d12",
+    storageBucket: "doshas-e5d12.firebasestorage.app",
+    messagingSenderId: "1005308467875",
+    appId: "1:1005308467875:web:7de501912aa760024dbd16",
+    measurementId: "G-CRXBZTTB83"
+};
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const guardDb = firebase.database();
+
+        const guardAuth = firebase.auth();
+        let onFireSessionReady = false;
+
+        // Firebase Auth هو مصدر الجلسة الأساسي. لا نعيد الطالب لصفحة الدخول
+        // لمجرد أن كود البريد القديم غير موجود في قاعدة البيانات.
+        guardAuth.onAuthStateChanged(async function(user) {
+            if (!user) {
+                window.location.replace('index.html');
+                return;
+            }
+
+            if ((user.email || '').toLowerCase() === 'ofire8000@gmail.com') {
+                window.location.replace('control.html');
+                return;
+            }
+
+            try {
+                const profileSnap = await guardDb.ref('studentProfiles/' + user.uid).once('value');
+                const profile = profileSnap.val();
+                if (!profile || !profile.gradePage) {
+                    window.location.replace('index.html');
+                    return;
+                }
+                const currentPage = window.location.pathname.split('/').pop();
+                if (profile.gradePage !== currentPage) {
+                    window.location.replace(profile.gradePage);
+                    return;
+                }
+
+                // فحص سجل الكود القديم اختياري للتوافق مع الحسابات السابقة.
+                // غياب السجل لا يسبب حلقة تحويل؛ أما السجل الموقوف فينهي الجلسة.
+                const legacyCode = (user.email || '').split('@')[0];
+                if (legacyCode) {
+                    const legacySnap = await guardDb.ref('codes/' + legacyCode).once('value');
+                    if (legacySnap.exists()) {
+                        const legacy = legacySnap.val() || {};
+                        const status = String(legacy.status || 'active').trim().toLowerCase();
+                        if (['inactive', 'stopped', 'false'].includes(status)) {
+                            localStorage.removeItem('activeStudentCode');
+                            await guardAuth.signOut();
+                            window.location.replace('index.html?expired=true');
+                            return;
+                        }
+                    }
+                }
+            } catch (error) {
+                // لو فشل استعلام قاعدة البيانات بسبب اتصال/صلاحيات، لا نبدأ
+                // إعادة توجيه لا نهائية. جلسة Firebase نفسها ما زالت موجودة.
+                console.error('تعذر التحقق من ملف الطالب في قاعدة البيانات:', error);
+            }
+
+            onFireSessionReady = true;
+            window.dispatchEvent(new Event('onfire:student-ready'));
+        });
+
+    </script>
+
+    <meta name="theme-color" content="#ff6b00">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" type="image/svg+xml" href="app-icon.svg">
+    <link rel="stylesheet" href="app-enhancements.css">
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <div class="site-logo">
+                <img src="https://i.postimg.cc/Fz97Zty5/Whats-App-Image-2026-09-10-at-2-49-35-AM.jpg" alt="On Fire Logo">
+            </div>
+            <h1><span class="fire-text">On Fire</span> <span class="academy-text">ACADEMY</span></h1>
+        </div>
+        <div class="header-actions">
+            <button class="lang-btn" id="langToggleBtn" onclick="toggleLanguage()">English</button>
+            <button class="logout-btn" id="logoutBtnText" onclick="logout()">خروج</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- عرض قائمة المعلمين -->
+        <div id="teachersView">
+            <h2 class="section-title" id="mainSectionTitle">قائمة المعلمين</h2>
+            <p class="section-desc" id="chooseTeacherText">اختر المعلم لعرض الدروس الخاصة به:</p>
+            <div class="teachers-grid" id="teachersGrid"></div>
+        </div>
+
+        <!-- عرض دروس المدرس المحدد -->
+        <div id="lessonsView" class="lessons-section">
+            <button class="back-to-teachers" id="backBtnText" onclick="showTeachersList()">← العودة لقائمة المدرسين</button>
+            <h2 id="selectedTeacherTitle">دروس المعلم</h2>
+            <div id="lessonsListContainer"></div>
+        </div>
+    </div>
+
+    <footer>
+        <span id="footerText">جميع الحقوق محفوظة © On Fire Academy 2026</span>
+    </footer>
+
+    <script>
+        let currentLang = 'ar';
+        
+        const teachersList = [
+            {
+                        "name": "محمد فهمي",
+                        "nameEn": "Mohamed Fahmy",
+                        "subject": "عربي",
+                        "image": "https://i.postimg.cc/KjzQHWb0/lqtt-shasht-2026-09-09-012550.png"
+            },
+            {
+                        "name": "هيثم ثابت",
+                        "nameEn": "Haitham Thabet",
+                        "subject": "عربي",
+                        "image": "https://i.postimg.cc/KjzQHWb0/lqtt-shasht-2026-09-09-012550.png"
+            },
+            {
+                        "name": "بيتر رضا",
+                        "nameEn": "Peter Reda",
+                        "subject": "علوم",
+                        "image": "https://i.postimg.cc/mZzmc1kH/lqtt-shasht-2026-09-09-012312.png"
+            },
+            {
+                        "name": "محمود حسان",
+                        "nameEn": "Mahmoud Hassan",
+                        "subject": "علوم",
+                        "image": "https://i.postimg.cc/mZzmc1kH/lqtt-shasht-2026-09-09-012312.png"
+            },
+            {
+                        "name": "إبراهيم الدوسري",
+                        "nameEn": "Ibrahim Aldosari",
+                        "subject": "دراسات",
+                        "image": "https://i.postimg.cc/KjzQHWb0/lqtt-shasht-2026-09-09-012550.png"
+            },
+            {
+                        "name": "إسلام سليمان",
+                        "nameEn": "Islam Suleiman",
+                        "subject": "رياضيات",
+                        "image": "https://i.postimg.cc/KjzQHWb0/lqtt-shasht-2026-09-09-012550.png"
+            },
+            {
+                        "name": "محمد الشيخ",
+                        "nameEn": "Mohamed Elsheikh",
+                        "subject": "رياضيات",
+                        "image": "https://i.postimg.cc/KjzQHWb0/lqtt-shasht-2026-09-09-012550.png"
+            },
+            {
+                        "name": "عبيد",
+                        "nameEn": "Obaid",
+                        "subject": "فرنساوي",
+                        "image": "https://i.postimg.cc/KjzQHWb0/lqtt-shasht-2026-09-09-012550.png"
+            },
+            {
+                        "name": "سلمى جمعة",
+                        "nameEn": "Salma Gomaa",
+                        "subject": "إنجليزي",
+                        "image": "https://i.postimg.cc/mZzmc1kH/lqtt-shasht-2026-09-09-012312.png"
+            }
+];
+
+        let firebaseLessonsData = {};
+
+        function loadStudentLessons() {
+            guardDb.ref('lessons').once('value')
+                .then(snapshot => {
+                    if (snapshot.exists()) firebaseLessonsData = snapshot.val();
+                    renderTeachers();
+                })
+                .catch(err => {
+                    console.log('خطأ في جلب الدروس:', err);
+                    renderTeachers();
+                });
+        }
+
+        window.addEventListener('load', function() {
+            if (onFireSessionReady) loadStudentLessons();
+            else window.addEventListener('onfire:student-ready', loadStudentLessons, { once: true });
+        });
+
+        function logout() {
+            localStorage.removeItem('activeStudentCode');
+            guardAuth.signOut().finally(() => window.location.replace('index.html'));
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            const htmlRoot = document.getElementById('htmlRoot');
+            
+            if (currentLang === 'en') {
+                htmlRoot.setAttribute('lang', 'en');
+                htmlRoot.setAttribute('dir', 'ltr');
+                document.getElementById('pageTitle').innerText = "Teachers List - On Fire Academy";
+                document.getElementById('langToggleBtn').innerText = "العربية";
+                document.getElementById('logoutBtnText').innerText = "Logout";
+                document.getElementById('mainSectionTitle').innerText = "Teachers List";
+                document.getElementById('chooseTeacherText').innerText = "Select a teacher to view lessons:";
+                document.getElementById('backBtnText').innerText = "← Back to Teachers List";
+                document.getElementById('footerText').innerText = "All Rights Reserved © On Fire Academy 2026";
+            } else {
+                htmlRoot.setAttribute('lang', 'ar');
+                htmlRoot.setAttribute('dir', 'rtl');
+                document.getElementById('pageTitle').innerText = "On Fire Academy - منصة الدروس";
+                document.getElementById('langToggleBtn').innerText = "English";
+                document.getElementById('logoutBtnText').innerText = "خروج";
+                document.getElementById('mainSectionTitle').innerText = "قائمة المعلمين";
+                document.getElementById('chooseTeacherText').innerText = "اختر المعلم لعرض الدروس الخاصة به:";
+                document.getElementById('backBtnText').innerText = "← العودة لقائمة المدرسين";
+                document.getElementById('footerText').innerText = "جميع الحقوق محفوظة © On Fire Academy 2026";
+            }
+            renderTeachers();
+            
+            const lessonsView = document.getElementById('lessonsView');
+            if (lessonsView.style.display === 'block' && window.selectedTeacherName !== undefined) {
+                selectTeacher(window.selectedTeacherName);
+            }
+        }
+
+        function renderTeachers() {
+            const grid = document.getElementById('teachersGrid');
+            grid.innerHTML = "";
+
+            teachersList.forEach((teacher) => {
+                const card = document.createElement('div');
+                card.className = 'teacher-card';
+                card.onclick = () => selectTeacher(teacher.name);
+
+                const tName = currentLang === 'ar' ? teacher.name : teacher.nameEn;
+
+                card.innerHTML = `
+                    <img src="${teacher.image}" alt="${tName}" class="teacher-avatar">
+                    <div class="teacher-info">
+                        <h3>${tName}</h3>
+                        <p class="teacher-subject">${currentLang === 'ar' ? teacher.subject : ({'عربي':'Arabic','علوم':'Science','علوم متكاملة':'Integrated Science','كيمياء':'Chemistry','جيولوجيا':'Geology','دراسات':'Social Studies','تاريخ':'History','رياضيات':'Mathematics','فرنساوي':'French','إنجليزي':'English'}[teacher.subject] || teacher.subject)}</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        const PAGE_GRADE_ALIASES = ["ثالثة إعدادي", "تالته إعدادي", "ثالثه اعدادي", "الصف الثالث الإعدادي", "الصف التالت الإعدادي"];
+
+        function selectTeacher(teacherName) {
+            window.selectedTeacherName = teacherName;
+            document.getElementById('teachersView').style.display = 'none';
+            document.getElementById('lessonsView').style.display = 'block';
+
+            document.getElementById('selectedTeacherTitle').innerText = `دروس الأستاذ: ${teacherName}`;
+
+            const container = document.getElementById('lessonsListContainer');
+            container.innerHTML = "";
+
+            let hasLessons = false;
+            let safeTeacherKey = teacherName.replace(/\s+/g, '_');
+
+            for (let gradeKey in firebaseLessonsData) {
+                let gradeName = gradeKey.replace(/_/g, ' ');
+                const normalizedGradeName = gradeName.trim();
+                if (!PAGE_GRADE_ALIASES.some(alias => normalizedGradeName.includes(alias))) continue;
+
+                if (teacherName === "محمود حسان" && (gradeName.includes("ثانية ثانوي") || gradeName.includes("ثانيه_ثانوي"))) {
+                    continue;
+                }
+
+                let gradeTeachers = firebaseLessonsData[gradeKey];
+                let teacherData = gradeTeachers[safeTeacherKey] || gradeTeachers[teacherName] || {};
+
+                for (let unitKey in teacherData) {
+                    let unitName = unitKey.replace(/_/g, ' ');
+                    let unitsLessons = teacherData[unitKey];
+
+                    if (typeof unitsLessons === 'object' && unitsLessons !== null) {
+                        let unitDiv = document.createElement('div');
+                        unitDiv.className = 'unit-title';
+                        unitDiv.innerText = `📂 ${gradeName} - ${unitName}`;
+                        container.appendChild(unitDiv);
+
+                        for (let lessonId in unitsLessons) {
+                            let lesson = unitsLessons[lessonId];
+                            if (lesson && lesson.lessonName && lesson.youtubeUrl) {
+                                hasLessons = true;
+                                
+                                // تجهيز روابط البارامتر لصفحة المشغل الخارجي
+                                let encodedUrl = encodeURIComponent(lesson.youtubeUrl);
+                                let encodedTitle = encodeURIComponent(lesson.lessonName);
+
+                                let lessonDiv = document.createElement('div');
+                                lessonDiv.className = 'lesson-card-item';
+                                lessonDiv.innerHTML = `
+                                    <div class="lesson-title">📖 ${lesson.lessonName}</div>
+                                    <a href="player.html?url=${encodedUrl}&title=${encodedTitle}" target="_blank" class="watch-btn">مشاهدة الدرس 🎬</a>
+                                `;
+                                container.appendChild(lessonDiv);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!hasLessons) {
+                container.innerHTML = currentLang === 'ar' ? 
+                    "<p style='color: #9ca3af; text-align: center; padding: 20px;'>لا توجد دروس مضافة لهذا المعلم حتى الآن.</p>" : 
+                    "<p style='color: #9ca3af; text-align: center; padding: 20px;'>No lessons added for this teacher yet.</p>";
+            }
+        }
+
+        function showTeachersList() {
+            document.getElementById('lessonsListContainer').innerHTML = "";
+            document.getElementById('lessonsView').style.display = 'none';
+            document.getElementById('teachersView').style.display = 'block';
+
+            if (screen.orientation && screen.orientation.unlock) {
+                try {
+                    screen.orientation.unlock();
+                } catch (e) {}
+            }
+
+            window.dispatchEvent(new Event('resize'));
+        }
+    </script>
+    <script src="app-enhancements.js" defer></script>
+</body>
+</html>
